@@ -14,8 +14,8 @@ class MemcachedStats:
             self._client = telnetlib.Telnet(self._host, self._port)
         return self._client
 
-    def keys(self, sort=True):
-        ' Return a list of keys in use '
+    def key_details(self, sort=True):
+        ' Return a list of tuples containing keys and details '
         keys = []
         slab_ids = self.slab_ids()
         for id in slab_ids:
@@ -25,6 +25,10 @@ class MemcachedStats:
         if sort:
             return sorted(keys)
         return keys
+
+    def keys(self, sort=True):
+        ' Return a list of keys in use '
+        return [key[0] for key in self.key_details(sort=sort)]
 
     def slab_ids(self):
         ' Return a list of slab ids in use '
