@@ -14,17 +14,22 @@ class MemcachedStats:
             self._client = telnetlib.Telnet(self._host, self._port)
         return self._client
 
+    def command(self, cmd):
+        ' Write a command to telnet and return the response '
+        self.client.write("%s\n" % cmd)
+        return self.client.read_until('END')
+
     def key_details(self, sort=True):
         ' Return a list of tuples containing keys and details '
+        regex = 'ITEM (.*) \[(.*); (.*)\]'
+        cmd = 'stats cachedump %s 100'
         keys = []
-        slab_ids = self.slab_ids()
-        for id in slab_ids:
-            self.client.write("stats cachedump %s 100\n" % id)
-            response = self.client.read_until('END')
-            keys.extend(re.findall('ITEM (.*) \[(.*); (.*)\]', response))
+        for id in self.slab_ids():
+            keys.extend(re.findall(regex, self.command(cmd % id)))
         if sort:
             return sorted(keys)
-        return keys
+        else:
+            return keys
 
     def keys(self, sort=True):
         ' Return a list of keys in use '
@@ -32,12 +37,10 @@ class MemcachedStats:
 
     def slab_ids(self):
         ' Return a list of slab ids in use '
-        self.client.write("stats items\n")
-        response = self.client.read_until('END')
-        return re.findall('STAT items:(.*):number', response)
+        regex = 'STAT items:(.*):number'
+        return re.findall(regex, self.command('stats items'))
 
     def stats(self):
         ' Return a dict containing memcached stats '
-        self.client.write("stats\n")
-        response = self.client.read_until('END')
-        return dict(re.findall("STAT (.*) (.*)\r", response))
+        regex = "STAT (.*) (.*)\r"
+        return dict(re.findall(regex, self.command('stats')))
