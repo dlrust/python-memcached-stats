@@ -4,7 +4,7 @@ Python class to gather stats and slab keys from memcached via the memcached teln
 
 ## Usage
 
-Usage is simple:
+Basic usage:
 
     from memcached_stats import MemcachedStats
     mem = MemcachedStats()
@@ -28,3 +28,11 @@ Retrieve a list of keys currently in use:
      'key-2',
      'key-3',
      ... ]
+
+## Installation
+
+    pip install 'git+git://github.com/dlrust/python-memcached-stats.git'
+
+## License
+
+python-memcached-stats is released under the [MIT license](http://creativecommons.org/licenses/MIT/).
