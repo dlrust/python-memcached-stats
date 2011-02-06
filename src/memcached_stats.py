@@ -1,5 +1,9 @@
 import re, telnetlib
 
+key_regex = re.compile(ur'ITEM (.*) \[(.*); (.*)\]')
+slab_regex = re.compile(ur'STAT items:(.*):number')
+stat_regex = re.compile(ur"STAT (.*) (.*)\r")
+
 class MemcachedStats:
 
     _client = None
@@ -21,11 +25,10 @@ class MemcachedStats:
 
     def key_details(self, sort=True):
         ' Return a list of tuples containing keys and details '
-        regex = 'ITEM (.*) \[(.*); (.*)\]'
         cmd = 'stats cachedump %s 100'
         keys = []
         for id in self.slab_ids():
-            keys.extend(re.findall(regex, self.command(cmd % id)))
+            keys.extend(key_regex.findall(self.command(cmd % id)))
         if sort:
             return sorted(keys)
         else:
@@ -37,10 +40,8 @@ class MemcachedStats:
 
     def slab_ids(self):
         ' Return a list of slab ids in use '
-        regex = 'STAT items:(.*):number'
-        return re.findall(regex, self.command('stats items'))
+        return slab_regex.findall(self.command('stats items'))
 
     def stats(self):
         ' Return a dict containing memcached stats '
-        regex = "STAT (.*) (.*)\r"
-        return dict(re.findall(regex, self.command('stats')))
+        return dict(stat_regex.findall(self.command('stats')))
