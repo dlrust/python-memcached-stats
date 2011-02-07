@@ -25,9 +25,8 @@ class MemcachedStats:
     def key_details(self, sort=True):
         ' Return a list of tuples containing keys and details '
         cmd = 'stats cachedump %s 100'
-        keys = []
-        for id in self.slab_ids():
-            keys.extend(self._key_regex.findall(self.command(cmd % id)))
+        keys = [j for i in [self._key_regex.findall(self.command(cmd % id))
+            for id in self.slab_ids()] for j in i] # flatten list
         if sort:
             return sorted(keys)
         else:
