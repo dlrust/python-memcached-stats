@@ -1,4 +1,4 @@
-import re, telnetlib
+import re, telnetlib, sys
 
 class MemcachedStats:
 
@@ -43,3 +43,15 @@ class MemcachedStats:
     def stats(self):
         ' Return a dict containing memcached stats '
         return dict(self._stat_regex.findall(self.command('stats')))
+
+def main(argv=None):
+    if not argv:
+        argv = sys.argv
+    host = argv[1] if len(argv) >= 2 else '127.0.0.1'
+    port = argv[2] if len(argv) >= 3 else '11211'
+    import pprint
+    m = MemcachedStats(host, port)
+    pprint.pprint(m.keys())
+
+if __name__ == '__main__':
+    main()
