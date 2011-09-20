@@ -29,6 +29,14 @@ Retrieve a list of keys currently in use:
      'key-3',
      ... ]
 
+## List the keys
+
+If you just want to list some of the keys in memcached, run this from the command line:
+
+    python -m memcached_stats <ip> <port>
+
+ip defaults to 127.0.0.1 and port defaults to 11211.
+
 ## Installation
 
     pip install 'git+git://github.com/dlrust/python-memcached-stats.git'
