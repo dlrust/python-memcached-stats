@@ -6,7 +6,6 @@ locale.setlocale(locale.LC_ALL, '')
 
 
 class MemcachedStats:
-    # https://github.com/dlrust/python-memcached-stats
     _client = None
     _key_regex = re.compile(ur'ITEM (.*) \[(.*); (.*)\]')
     _slab_regex = re.compile(ur'STAT items:(.*):number')
@@ -43,11 +42,11 @@ class MemcachedStats:
         else:
             return stats
 
-    def format_details(self, stats, header=True, headerlens=[-40, 20, -20]):
-        fmtstrs = [ ('%%%s.%ss ' % (l, abs(l))) for l in headerlens ]
+    def format_details(self, stats, header=True, hdrcolsizes=[-40, 20, -20]):
+        fmtstrs = [ ('%%%s.%ss ' % (l, abs(l))) for l in hdrcolsizes ]
         details = ''
         if header:
-            details += fmtstrs[0] % 'KEY '
+            details += fmtstrs[0] % 'KEY NAME'
             details += fmtstrs[1] % 'SIZE    '
             details += (fmtstrs[2] + '\n') % 'EXPIRES'
 
@@ -55,8 +54,17 @@ class MemcachedStats:
             details += fmtstrs[0] % stat[3]        # name
             details += fmtstrs[1] % (              # bytes
                 locale.format('%d', int(stat[5]), True) + ' b    ')
-            datestr = str(datetime.fromtimestamp(int(stat[7])) - datetime.now())
-            datestr = ''.join(datestr.partition('.')[0])  # chop ms
+            # date
+            delta = datetime.fromtimestamp(int(stat[7])) - datetime.now()
+            if delta.days >= 0:
+                try:
+                    datestr = str(delta).partition('.')[0] # chop ms
+                    tokens = datestr.split(':')
+                    datestr = '%2sh %2sm %2ss' % tuple(tokens)
+                except (IndexError, TypeError):
+                    datestr = str(delta)
+            else:
+                datestr = 'expired'
             details += (fmtstrs[2] + '\n') % datestr       # date
         return details
 
