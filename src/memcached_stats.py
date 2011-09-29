@@ -1,4 +1,8 @@
 #!/usr/bin/env python
+'''
+    lsmc
+    Lists the contents of memcached.
+'''
 import re, telnetlib, sys
 from datetime import datetime
 import locale
@@ -60,7 +64,13 @@ class MemcachedStats:
                 try:
                     datestr = str(delta).partition('.')[0] # chop ms
                     tokens = datestr.split(':')
-                    datestr = '%2sh %2sm %2ss' % tuple(tokens)
+                    if ',' in tokens[0]:
+                        day_hour = tokens[0].split()
+                        tokens[0] = day_hour[2]
+                        tokens.insert(0, day_hour[0])
+                        datestr = '%02dd %02dh %02dm %02ds' % tuple((int(t) for t in tokens))
+                    else:
+                        datestr = '... %02dh %02dm %02ds' % tuple((int(t) for t in tokens))
                 except (IndexError, TypeError):
                     datestr = str(delta)
             else:
