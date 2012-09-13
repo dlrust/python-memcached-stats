@@ -22,19 +22,19 @@ class MemcachedStats:
         self.client.write("%s\n" % cmd)
         return self.client.read_until('END')
 
-    def key_details(self, sort=True):
+    def key_details(self, sort=True, limit=100):
         ' Return a list of tuples containing keys and details '
-        cmd = 'stats cachedump %s 100'
+        cmd = 'stats cachedump %s %s'
         keys = [key for id in self.slab_ids()
-            for key in self._key_regex.findall(self.command(cmd % id))]
+            for key in self._key_regex.findall(self.command(cmd % (id, limit)))]
         if sort:
             return sorted(keys)
         else:
             return keys
 
-    def keys(self, sort=True):
+    def keys(self, sort=True, limit=100):
         ' Return a list of keys in use '
-        return [key[0] for key in self.key_details(sort=sort)]
+        return [key[0] for key in self.key_details(sort=sort, limit=limit)]
 
     def slab_ids(self):
         ' Return a list of slab ids in use '
