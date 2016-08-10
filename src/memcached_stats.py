@@ -3,9 +3,9 @@ import re, telnetlib, sys
 class MemcachedStats:
 
     _client = None
-    _key_regex = re.compile(ur'ITEM (.*) \[(.*); (.*)\]')
-    _slab_regex = re.compile(ur'STAT items:(.*):number')
-    _stat_regex = re.compile(ur"STAT (.*) (.*)\r")
+    _key_regex = re.compile(r'ITEM (.*) \[(.*); (.*)\]')
+    _slab_regex = re.compile(r'STAT items:(.*):number')
+    _stat_regex = re.compile(r"STAT (.*) (.*)\r")
 
     def __init__(self, host='localhost', port='11211'):
         self._host = host
@@ -19,8 +19,8 @@ class MemcachedStats:
 
     def command(self, cmd):
         ' Write a command to telnet and return the response '
-        self.client.write("%s\n" % cmd)
-        return self.client.read_until('END')
+        self.client.write(("%s\n" % cmd).encode('ascii'))
+        return self.client.read_until(b'END').decode('ascii')
 
     def key_details(self, sort=True, limit=100):
         ' Return a list of tuples containing keys and details '
