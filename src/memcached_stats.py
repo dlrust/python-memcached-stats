@@ -7,14 +7,16 @@ class MemcachedStats:
     _slab_regex = re.compile(ur'STAT items:(.*):number')
     _stat_regex = re.compile(ur"STAT (.*) (.*)\r")
 
-    def __init__(self, host='localhost', port='11211'):
+    def __init__(self, host='localhost', port='11211', timeout=None):
         self._host = host
         self._port = port
+        self._timeout = timeout
 
     @property
     def client(self):
         if self._client is None:
-            self._client = telnetlib.Telnet(self._host, self._port)
+            self._client = telnetlib.Telnet(self._host, self._port,
+                                            self._timeout)
         return self._client
 
     def command(self, cmd):
